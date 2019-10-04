@@ -1,13 +1,13 @@
 modLoader="javafml"
 loaderVersion="[28,)"
-issueTrackerURL="http://my.issue.tracker/" #optional
+#issueTrackerURL="http://my.issue.tracker/" #optional
 
 [[mods]]
 modId="thehatefulsun"
 version="${file.jarVersion}"
 displayName="The Hateful Sun"
-updateJSONURL=""
-displayURL="http://williambl.com/"
+#updateJSONURL=""
+#displayURL="http://williambl.com/"
 logoFile=""
 credits=""
 authors="Willbl3pic"
