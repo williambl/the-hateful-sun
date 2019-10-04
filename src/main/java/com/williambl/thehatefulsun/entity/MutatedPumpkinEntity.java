@@ -1,13 +1,17 @@
 package com.williambl.thehatefulsun.entity;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
@@ -42,7 +46,7 @@ public class MutatedPumpkinEntity extends MobEntity {
         this.goalSelector.addGoal(2, new MutatedPumpkinEntity.AttackGoal(this));
         this.goalSelector.addGoal(3, new MutatedPumpkinEntity.FaceRandomGoal(this));
         this.goalSelector.addGoal(5, new MutatedPumpkinEntity.HopGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, (p_213811_1_) -> Math.abs(p_213811_1_.posY - this.posY) <= 4.0D));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, (target) -> Math.abs(target.posY - this.posY) <= 4.0D));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolemEntity.class, true));
     }
 
@@ -62,7 +66,7 @@ public class MutatedPumpkinEntity extends MobEntity {
     }
 
     protected IParticleData getSquishParticle() {
-        return ParticleTypes.ITEM_SLIME;
+        return new ItemParticleData(ParticleTypes.ITEM, new ItemStack(Item.getItemFromBlock(Blocks.PUMPKIN)));
     }
 
     /**
@@ -142,7 +146,7 @@ public class MutatedPumpkinEntity extends MobEntity {
     protected void dealDamage(LivingEntity entityIn) {
         if (this.isAlive()) {
             if (this.getDistanceSq(entityIn) < 5.76 && this.canEntityBeSeen(entityIn) && entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)this.getAttackStrength())) {
-                this.playSound(SoundEvents.ENTITY_SLIME_ATTACK, 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+                this.playSound(SoundEvents.BLOCK_WOOD_BREAK, 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
                 this.applyEnchantments(this, entityIn);
             }
         }
@@ -169,16 +173,16 @@ public class MutatedPumpkinEntity extends MobEntity {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return SoundEvents.ENTITY_SLIME_HURT;
+        return SoundEvents.BLOCK_PUMPKIN_CARVE;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_SLIME_DEATH;
+        return SoundEvents.BLOCK_WOOD_BREAK;
     }
 
     protected SoundEvent getSquishSound() {
-        return SoundEvents.ENTITY_SLIME_SQUISH;
+        return SoundEvents.BLOCK_PUMPKIN_CARVE;
     }
 
     @Override
@@ -220,7 +224,7 @@ public class MutatedPumpkinEntity extends MobEntity {
     }
 
     protected SoundEvent getJumpSound() {
-        return SoundEvents.ENTITY_SLIME_JUMP;
+        return SoundEvents.BLOCK_WOOD_STEP;
     }
 
     @Override
