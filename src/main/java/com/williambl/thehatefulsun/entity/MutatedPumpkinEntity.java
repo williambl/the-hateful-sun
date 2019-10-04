@@ -7,32 +7,25 @@ import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.storage.loot.LootTables;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
-import java.util.Random;
 
 public class MutatedPumpkinEntity extends MobEntity {
 
-    private static final DataParameter<Integer> SLIME_SIZE = EntityDataManager.createKey(MutatedPumpkinEntity.class, DataSerializers.VARINT);
     public float squishAmount;
     public float squishFactor;
     public float prevSquishFactor;
@@ -43,64 +36,29 @@ public class MutatedPumpkinEntity extends MobEntity {
         this.moveController = new MutatedPumpkinEntity.MoveHelperController(this);
     }
 
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new MutatedPumpkinEntity.FloatGoal(this));
         this.goalSelector.addGoal(2, new MutatedPumpkinEntity.AttackGoal(this));
         this.goalSelector.addGoal(3, new MutatedPumpkinEntity.FaceRandomGoal(this));
         this.goalSelector.addGoal(5, new MutatedPumpkinEntity.HopGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, (p_213811_1_) -> {
-            return Math.abs(p_213811_1_.posY - this.posY) <= 4.0D;
-        }));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, (p_213811_1_) -> Math.abs(p_213811_1_.posY - this.posY) <= 4.0D));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolemEntity.class, true));
     }
 
-    protected void registerData() {
-        super.registerData();
-        this.dataManager.register(SLIME_SIZE, 1);
-    }
-
-    protected void setSlimeSize(int size, boolean resetHealth) {
-        this.dataManager.set(SLIME_SIZE, size);
-        this.setPosition(this.posX, this.posY, this.posZ);
-        this.recalculateSize();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue((double)(size * size));
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double)(0.2F + 0.1F * (float)size));
-        if (resetHealth) {
-            this.setHealth(this.getMaxHealth());
-        }
-
-        this.experienceValue = size;
-    }
-
-    /**
-     * Returns the size of the mutatedPumpkin.
-     */
-    public int getSlimeSize() {
-        return this.dataManager.get(SLIME_SIZE);
-    }
-
+    @Override
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
-        compound.putInt("Size", this.getSlimeSize() - 1);
         compound.putBoolean("wasOnGround", this.wasOnGround);
     }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
+    @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        int i = compound.getInt("Size");
-        if (i < 0) {
-            i = 0;
-        }
-
-        this.setSlimeSize(i + 1, false);
         this.wasOnGround = compound.getBoolean("wasOnGround");
-    }
-
-    public boolean isSmallSlime() {
-        return this.getSlimeSize() <= 1;
     }
 
     protected IParticleData getSquishParticle() {
@@ -110,8 +68,9 @@ public class MutatedPumpkinEntity extends MobEntity {
     /**
      * Called to update the entity's position/logic.
      */
+    @Override
     public void tick() {
-        if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL && this.getSlimeSize() > 0) {
+        if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL) {
             this.remove(); //Forge: Kill entity with notification to caps/subclasses.
         }
 
@@ -119,9 +78,8 @@ public class MutatedPumpkinEntity extends MobEntity {
         this.prevSquishFactor = this.squishFactor;
         super.tick();
         if (this.onGround && !this.wasOnGround) {
-            int i = this.getSlimeSize();
 
-            if (spawnCustomParticles()) i = 0; // don't spawn particles if it's handled by the implementation itself
+            int i = 4;
             for(int j = 0; j < i * 8; ++j) {
                 float f = this.rand.nextFloat() * ((float)Math.PI * 2F);
                 float f1 = this.rand.nextFloat() * 0.5F + 0.5F;
@@ -155,82 +113,42 @@ public class MutatedPumpkinEntity extends MobEntity {
         return this.rand.nextInt(20) + 10;
     }
 
-    public void notifyDataManagerChange(DataParameter<?> key) {
-        if (SLIME_SIZE.equals(key)) {
-            this.recalculateSize();
-            this.rotationYaw = this.rotationYawHead;
-            this.renderYawOffset = this.rotationYawHead;
-            if (this.isInWater() && this.rand.nextInt(20) == 0) {
-                this.doWaterSplashEffect();
-            }
-        }
-
-        super.notifyDataManagerChange(key);
-    }
-
+    @Override
     public EntityType<? extends MutatedPumpkinEntity> getType() {
         return (EntityType<? extends MutatedPumpkinEntity>) super.getType();
-    }
-
-    @Override
-    public void remove(boolean keepData) {
-        int i = this.getSlimeSize();
-        if (!this.world.isRemote && i > 1 && this.getHealth() <= 0.0F && !this.removed) {
-            int j = 2 + this.rand.nextInt(3);
-
-            for(int k = 0; k < j; ++k) {
-                float f = ((float)(k % 2) - 0.5F) * (float)i / 4.0F;
-                float f1 = ((float)(k / 2) - 0.5F) * (float)i / 4.0F;
-                MutatedPumpkinEntity mutatedPumpkinentity = this.getType().create(this.world);
-                if (this.hasCustomName()) {
-                    mutatedPumpkinentity.setCustomName(this.getCustomName());
-                }
-
-                if (this.isNoDespawnRequired()) {
-                    mutatedPumpkinentity.enablePersistence();
-                }
-
-                mutatedPumpkinentity.setSlimeSize(i / 2, true);
-                mutatedPumpkinentity.setLocationAndAngles(this.posX + (double)f, this.posY + 0.5D, this.posZ + (double)f1, this.rand.nextFloat() * 360.0F, 0.0F);
-                this.world.addEntity(mutatedPumpkinentity);
-            }
-        }
-
-        super.remove(keepData);
     }
 
     /**
      * Applies a velocity to the entities, to push them away from eachother.
      */
+    @Override
     public void applyEntityCollision(Entity entityIn) {
         super.applyEntityCollision(entityIn);
         if (entityIn instanceof IronGolemEntity && this.canDamagePlayer()) {
             this.dealDamage((LivingEntity)entityIn);
         }
-
     }
 
     /**
      * Called by a player entity when they collide with an entity
      */
+    @Override
     public void onCollideWithPlayer(PlayerEntity entityIn) {
         if (this.canDamagePlayer()) {
             this.dealDamage(entityIn);
         }
-
     }
 
     protected void dealDamage(LivingEntity entityIn) {
         if (this.isAlive()) {
-            int i = this.getSlimeSize();
-            if (this.getDistanceSq(entityIn) < 0.6D * (double)i * 0.6D * (double)i && this.canEntityBeSeen(entityIn) && entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)this.getAttackStrength())) {
+            if (this.getDistanceSq(entityIn) < 5.76 && this.canEntityBeSeen(entityIn) && entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)this.getAttackStrength())) {
                 this.playSound(SoundEvents.ENTITY_SLIME_ATTACK, 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
                 this.applyEnchantments(this, entityIn);
             }
         }
-
     }
 
+    @Override
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 0.625F * sizeIn.height;
     }
@@ -239,78 +157,56 @@ public class MutatedPumpkinEntity extends MobEntity {
      * Indicates weather the mutatedPumpkin is able to damage the player (based upon the mutatedPumpkin's size)
      */
     protected boolean canDamagePlayer() {
-        return !this.isSmallSlime() && this.isServerWorld();
+        return this.isServerWorld();
     }
 
     /**
      * Gets the amount of damage dealt to the player when "attacked" by the mutatedPumpkin.
      */
     protected int getAttackStrength() {
-        return this.getSlimeSize();
+        return 4;
     }
 
+    @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return this.isSmallSlime() ? SoundEvents.ENTITY_SLIME_HURT_SMALL : SoundEvents.ENTITY_SLIME_HURT;
+        return SoundEvents.ENTITY_SLIME_HURT;
     }
 
+    @Override
     protected SoundEvent getDeathSound() {
-        return this.isSmallSlime() ? SoundEvents.ENTITY_SLIME_DEATH_SMALL : SoundEvents.ENTITY_SLIME_DEATH;
+        return SoundEvents.ENTITY_SLIME_DEATH;
     }
 
     protected SoundEvent getSquishSound() {
-        return this.isSmallSlime() ? SoundEvents.ENTITY_SLIME_SQUISH_SMALL : SoundEvents.ENTITY_SLIME_SQUISH;
+        return SoundEvents.ENTITY_SLIME_SQUISH;
     }
 
+    @Override
     protected ResourceLocation getLootTable() {
-        return this.getSlimeSize() == 1 ? this.getType().getLootTable() : LootTables.EMPTY;
-    }
-
-    public static boolean func_223366_c(EntityType<MutatedPumpkinEntity> p_223366_0_, IWorld p_223366_1_, SpawnReason reason, BlockPos p_223366_3_, Random randomIn) {
-        if (p_223366_1_.getWorldInfo().getGenerator().handleSlimeSpawnReduction(randomIn, p_223366_1_) && randomIn.nextInt(4) != 1) {
-            return false;
-        } else {
-            if (p_223366_1_.getDifficulty() != Difficulty.PEACEFUL) {
-                Biome biome = p_223366_1_.getBiome(p_223366_3_);
-                if (biome == Biomes.SWAMP && p_223366_3_.getY() > 50 && p_223366_3_.getY() < 70 && randomIn.nextFloat() < 0.5F && randomIn.nextFloat() < p_223366_1_.getCurrentMoonPhaseFactor() && p_223366_1_.getLight(p_223366_3_) <= randomIn.nextInt(8)) {
-                    return func_223315_a(p_223366_0_, p_223366_1_, reason, p_223366_3_, randomIn);
-                }
-
-                ChunkPos chunkpos = new ChunkPos(p_223366_3_);
-                boolean flag = SharedSeedRandom.seedSlimeChunk(chunkpos.x, chunkpos.z, p_223366_1_.getSeed(), 987234911L).nextInt(10) == 0;
-                if (randomIn.nextInt(10) == 0 && flag && p_223366_3_.getY() < 40) {
-                    return func_223315_a(p_223366_0_, p_223366_1_, reason, p_223366_3_, randomIn);
-                }
-            }
-
-            return false;
-        }
+        return this.getType().getLootTable();
     }
 
     /**
      * Returns the volume for the sounds this mob makes.
      */
+    @Override
     protected float getSoundVolume() {
-        return 0.4F * (float)this.getSlimeSize();
+        return 1f;
     }
 
     /**
      * The speed it takes to move the entityliving's rotationPitch through the faceEntity method. This is only currently
      * use in wolves.
      */
+    @Override
     public int getVerticalFaceSpeed() {
         return 0;
     }
 
     /**
-     * Returns true if the mutatedPumpkin makes a sound when it jumps (based upon the mutatedPumpkin's size)
-     */
-    protected boolean makesSoundOnJump() {
-        return this.getSlimeSize() > 0;
-    }
-
-    /**
      * Causes this entity to do an upwards motion (jumping).
      */
+    @Override
     protected void jump() {
         Vec3d vec3d = this.getMotion();
         this.setMotion(vec3d.x, (double)0.42F, vec3d.z);
@@ -318,30 +214,19 @@ public class MutatedPumpkinEntity extends MobEntity {
     }
 
     @Nullable
+    @Override
     public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-        int i = this.rand.nextInt(3);
-        if (i < 2 && this.rand.nextFloat() < 0.5F * difficultyIn.getClampedAdditionalDifficulty()) {
-            ++i;
-        }
-
-        int j = 1 << i;
-        this.setSlimeSize(j, true);
         return super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
     protected SoundEvent getJumpSound() {
-        return this.isSmallSlime() ? SoundEvents.ENTITY_SLIME_JUMP_SMALL : SoundEvents.ENTITY_SLIME_JUMP;
+        return SoundEvents.ENTITY_SLIME_JUMP;
     }
 
+    @Override
     public EntitySize getSize(Pose poseIn) {
-        return super.getSize(poseIn).scale(0.255F * (float)this.getSlimeSize());
+        return super.getSize(poseIn);
     }
-
-    /**
-     * Called when the mutatedPumpkin spawns particles on landing, see onUpdate.
-     * Return true to prevent the spawning of the default particles.
-     */
-    protected boolean spawnCustomParticles() { return false; }
 
     static class AttackGoal extends Goal {
         private final MutatedPumpkinEntity mutatedPumpkin;
@@ -519,9 +404,7 @@ public class MutatedPumpkinEntity extends MobEntity {
                         }
 
                         this.mutatedPumpkin.getJumpController().setJumping();
-                        if (this.mutatedPumpkin.makesSoundOnJump()) {
-                            this.mutatedPumpkin.playSound(this.mutatedPumpkin.getJumpSound(), this.mutatedPumpkin.getSoundVolume(), ((this.mutatedPumpkin.getRNG().nextFloat() - this.mutatedPumpkin.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
-                        }
+                        this.mutatedPumpkin.playSound(this.mutatedPumpkin.getJumpSound(), this.mutatedPumpkin.getSoundVolume(), ((this.mutatedPumpkin.getRNG().nextFloat() - this.mutatedPumpkin.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
                     } else {
                         this.mutatedPumpkin.moveStrafing = 0.0F;
                         this.mutatedPumpkin.moveForward = 0.0F;

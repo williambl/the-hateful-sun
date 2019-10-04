@@ -19,7 +19,7 @@ public class MutatedPumpkinRenderer extends MobRenderer<MutatedPumpkinEntity, Mu
    }
 
    public void doRender(MutatedPumpkinEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-      this.shadowSize = 0.25F * (float)entity.getSlimeSize();
+      this.shadowSize = 1f;
       super.doRender(entity, x, y, z, entityYaw, partialTicks);
    }
 
