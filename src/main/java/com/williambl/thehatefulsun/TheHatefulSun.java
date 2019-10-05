@@ -1,5 +1,6 @@
 package com.williambl.thehatefulsun;
 
+import com.williambl.thehatefulsun.client.render.AmalgamationRenderer;
 import com.williambl.thehatefulsun.client.render.MutatedPumpkinRenderer;
 import com.williambl.thehatefulsun.entity.AmalgamationEntity;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
@@ -48,6 +49,7 @@ public class TheHatefulSun
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(MutatedPumpkinEntity.class, MutatedPumpkinRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(AmalgamationEntity.class, AmalgamationRenderer::new);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event)
