@@ -1,6 +1,7 @@
 package com.williambl.thehatefulsun;
 
 import com.williambl.thehatefulsun.client.render.MutatedPumpkinRenderer;
+import com.williambl.thehatefulsun.entity.AmalgamationEntity;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityClassification;
@@ -78,6 +79,15 @@ public class TheHatefulSun
                             .setShouldReceiveVelocityUpdates(true)
                             .size(2.04f, 2.04f)
                             .build("mutated_pumpkin").setRegistryName("mutated_pumpkin")
+            );
+
+            event.getRegistry().register(
+                    EntityType.Builder.create(AmalgamationEntity::new, EntityClassification.MONSTER)
+                    .setUpdateInterval(1)
+                    .setTrackingRange(64)
+                    .setShouldReceiveVelocityUpdates(true)
+                    .size(1, 2)
+                    .build("amalgamation").setRegistryName("amalgamation")
             );
         }
     }
