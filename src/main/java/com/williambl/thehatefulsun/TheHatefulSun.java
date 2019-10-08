@@ -88,7 +88,7 @@ public class TheHatefulSun
                     .setUpdateInterval(1)
                     .setTrackingRange(64)
                     .setShouldReceiveVelocityUpdates(true)
-                    .size(1, 2)
+                    .size(1.1f, 1)
                     .build("amalgamation").setRegistryName("amalgamation")
             );
         }
