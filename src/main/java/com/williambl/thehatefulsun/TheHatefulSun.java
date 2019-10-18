@@ -92,5 +92,6 @@ public class TheHatefulSun
                     .build("amalgamation").setRegistryName("amalgamation")
             );
         }
+
     }
 }

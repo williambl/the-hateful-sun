@@ -50,6 +50,7 @@ public class SunlightEventHandler {
                     event.getEntity().rotationYaw,
                     event.getEntity().rotationPitch
             );
+            newEntity.setAmalgamationType(AmalgamationEntity.AmalgamationType.DOUBLEHEAD.ordinal());
 
             event.getEntity().world.addEntity(newEntity);
 

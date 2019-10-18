@@ -9,6 +9,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -18,9 +22,11 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
 public class AmalgamationEntity extends MonsterEntity {
+    private static final DataParameter<Integer> TYPE = EntityDataManager.createKey(AmalgamationEntity.class, DataSerializers.VARINT);
 
-    public AmalgamationEntity(EntityType<? extends MonsterEntity> type, World p_i48553_2_) {
-        super(type, p_i48553_2_);
+    public AmalgamationEntity(EntityType<? extends MonsterEntity> type, World world) {
+        super(type, world);
+        this.setAmalgamationType(AmalgamationType.BLOB.ordinal());
     }
 
     @Override
@@ -37,10 +43,68 @@ public class AmalgamationEntity extends MonsterEntity {
     @Override
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35.0D);
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double)0.23F);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
+        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35.0);
+        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0);
+        switch (getAmalgamationType()) {
+            case 0:
+                this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
+                this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0);
+                break;
+            case 1:
+                this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.15);
+                this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(7.0);
+                break;
+            case 2:
+                this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
+                this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0);
+                break;
+            case 3:
+                this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
+                this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    protected void registerData() {
+        super.registerData();
+        this.dataManager.register(TYPE, 0);
+    }
+
+    @Override
+    public void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        compound.putInt("Type", this.getAmalgamationType());
+    }
+
+    @Override
+    public void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+        this.setAmalgamationType(compound.getInt("Type"));
+    }
+
+    public void setAmalgamationType(int input) {
+        this.dataManager.set(TYPE, input);
+    }
+
+    public int getAmalgamationType() {
+        return this.dataManager.get(TYPE);
+    }
+
+    @Override
+    public void notifyDataManagerChange(DataParameter<?> key) {
+        if (TYPE.equals(key)) {
+            this.recalculateSize();
+            this.rotationYaw = this.rotationYawHead;
+            this.renderYawOffset = this.rotationYawHead;
+            if (this.isInWater() && this.rand.nextInt(20) == 0) {
+                this.doWaterSplashEffect();
+            }
+        }
+
+        super.notifyDataManagerChange(key);
     }
 
     /**
@@ -130,6 +194,29 @@ public class AmalgamationEntity extends MonsterEntity {
     @Override
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
         return 1.74F;
+    }
+
+    @Override
+    public EntitySize getSize(Pose poseIn) {
+        switch (getAmalgamationType()) {
+            case 0:
+                return new EntitySize(1.1f, 1.f, true);
+            case 1:
+                return new EntitySize(2.04f, 2.04f, true);
+            case 2:
+                return new EntitySize(4f, 4f, true);
+            case 3:
+                return new EntitySize(6f, 6f, true);
+            default:
+                return super.getSize(poseIn);
+        }
+    }
+
+    public enum AmalgamationType {
+        DOUBLEHEAD,
+        BLOB,
+        BIG,
+        HUGE
     }
 
 }
