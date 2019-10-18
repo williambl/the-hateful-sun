@@ -7,15 +7,15 @@ import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.model.ModelBox;
 
 public class AmalgamationModel extends EntityModel<AmalgamationEntity> {
-	private final RendererModel Root;
-	private final RendererModel HeadAndNeck;
-	private final RendererModel Head;
-	private final RendererModel HeadAndNeck2;
-	private final RendererModel Head2;
-	private final RendererModel Leg;
-	private final RendererModel Leg2;
-	private final RendererModel Leg3;
-	private final RendererModel Leg4;
+	final RendererModel Root;
+	final RendererModel HeadAndNeck;
+	final RendererModel Head;
+	final RendererModel HeadAndNeck2;
+	final RendererModel Head2;
+	final RendererModel Leg;
+	final RendererModel Leg2;
+	final RendererModel Leg3;
+	final RendererModel Leg4;
 
 	public AmalgamationModel() {
 		textureWidth = 128;
