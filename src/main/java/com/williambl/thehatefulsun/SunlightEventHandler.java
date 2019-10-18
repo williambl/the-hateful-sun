@@ -69,26 +69,26 @@ public class SunlightEventHandler {
     @SubscribeEvent
     public static void mutatePumpkin(BlockEvent.CropGrowEvent.Post event) {
         if (event.getWorld().isRemote()) return;
-        if (event.getWorld().getWorld().isDaytime()) return;
+        if (!event.getWorld().getWorld().isDaytime()) return;
         if (!event.getWorld().canBlockSeeSky(event.getPos())) return;
-        if (event.getState().getBlock() == Blocks.PUMPKIN) {
-            event.getWorld().removeBlock(event.getPos(), false);
+        if (event.getState().getBlock() == Blocks.PUMPKIN_STEM) {
+            for (int i = 0; i < event.getWorld().getRandom().nextInt(3)+1; i++) {
+                MutatedPumpkinEntity entity = new MutatedPumpkinEntity(ModEntities.mutatedPumpkin, event.getWorld().getWorld());
+                entity.setPosition(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
 
-            MutatedPumpkinEntity entity = new MutatedPumpkinEntity(ModEntities.mutatedPumpkin, event.getWorld().getWorld());
-            entity.setPosition(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
+                event.getWorld().addEntity(entity);
 
-            event.getWorld().addEntity(entity);
-
-            for (int i = 0; i < 10; i++) {
-                event.getWorld().addParticle(
-                        ParticleTypes.CLOUD,
-                        event.getPos().getX()+event.getWorld().getWorld().rand.nextDouble()-0.5,
-                        event.getPos().getY(),
-                        event.getPos().getZ()+event.getWorld().getWorld().rand.nextDouble()-0.5,
-                        0.0,
-                        0.1,
-                        0.0
-                );
+                for (int j = 0; j < 10; j++) {
+                    event.getWorld().addParticle(
+                            ParticleTypes.CLOUD,
+                            event.getPos().getX() + event.getWorld().getWorld().rand.nextDouble() - 0.5,
+                            event.getPos().getY(),
+                            event.getPos().getZ() + event.getWorld().getWorld().rand.nextDouble() - 0.5,
+                            0.0,
+                            0.1,
+                            0.0
+                    );
+                }
             }
         }
     }
