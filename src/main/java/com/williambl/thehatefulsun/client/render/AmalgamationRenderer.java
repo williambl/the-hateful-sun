@@ -12,11 +12,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
-public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, AmalgamationModel> {
-   private static final ResourceLocation TEXTURE = new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/amalgamation.png");
+public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, AmalgamationModelHolder>{
+   private static final ResourceLocation[] TEXTURES = {
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/quadruped.png"),
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png"),
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png"),
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png")
+   };
 
    public AmalgamationRenderer(EntityRendererManager renderManagerIn) {
-      super(renderManagerIn, new AmalgamationModel(), 0.25F);
+      super(renderManagerIn, new AmalgamationModelHolder(), 0.25F);
    }
 
    @Override
@@ -32,21 +37,31 @@ public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, Amalga
       super.doRender(entity, x, y, z, entityYaw, partialTicks);
    }
 
-   private void setRotationAngles(AmalgamationEntity entityIn, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch)  {
-      this.entityModel.Head.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-      this.entityModel.Head.rotateAngleY = netHeadYaw * ((float)Math.PI / 180F);
-      this.entityModel.Head2.rotateAngleX = headPitch * ((float)Math.PI / 180F);
-      this.entityModel.Head2.rotateAngleY = netHeadYaw * ((float)Math.PI / 180F);
-      this.entityModel.Leg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-      this.entityModel.Leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-      this.entityModel.Leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-      this.entityModel.Leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+   private void setRotationAngles(AmalgamationEntity entity, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch) {
+      if (entity.getAmalgamationType() == 0) {
+         AmalgamationQuadrupedModel quadrupedModel = (AmalgamationQuadrupedModel) this.entityModel.getActualModel(entity);
+         quadrupedModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+         quadrupedModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+         quadrupedModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+         quadrupedModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+         quadrupedModel.Leg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+         quadrupedModel.Leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+         quadrupedModel.Leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+         quadrupedModel.Leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+      } else {
+         AmalgamationBlobModel blobModel = (AmalgamationBlobModel) this.entityModel.getActualModel(entity);
+         blobModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+         blobModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+         blobModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+         blobModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+      }
+
    }
 
    @Nullable
    @Override
    protected ResourceLocation getEntityTexture(AmalgamationEntity entity) {
-      return TEXTURE;
+      return TEXTURES[entity.getAmalgamationType()];
    }
 
 }

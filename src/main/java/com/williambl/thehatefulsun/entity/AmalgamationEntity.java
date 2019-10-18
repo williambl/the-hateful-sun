@@ -213,7 +213,7 @@ public class AmalgamationEntity extends MonsterEntity {
     }
 
     public enum AmalgamationType {
-        DOUBLEHEAD,
+        QUADRUPED,
         BLOB,
         BIG,
         HUGE
