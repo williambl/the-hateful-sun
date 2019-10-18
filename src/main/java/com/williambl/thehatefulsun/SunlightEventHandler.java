@@ -9,6 +9,7 @@ import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -21,11 +22,11 @@ public class SunlightEventHandler {
 
     @SubscribeEvent
     public static void killPlayer(TickEvent.PlayerTickEvent event) {
-        if (event.side == LogicalSide.SERVER) return;
+        if (event.side == LogicalSide.CLIENT) return;
         if (event.player.isCreative()) return;
         if (!event.player.world.isDaytime()) return;
 
-        if (event.player.world.canBlockSeeSky(event.player.getPosition())) {
+        if (event.player.world.canBlockSeeSky(event.player.getPosition().offset(Direction.UP))) {
             event.player.attackEntityFrom(
                     new DamageSource("sunlight").setDamageBypassesArmor(),
                     event.player.getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty() ? 5.0f : 1.0f
