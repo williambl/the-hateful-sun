@@ -58,10 +58,6 @@ public class AmalgamationEntity extends MonsterEntity {
                 this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
                 this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0);
                 break;
-            case 3:
-                this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
-                this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0);
-                break;
             default:
                 break;
         }
@@ -205,8 +201,6 @@ public class AmalgamationEntity extends MonsterEntity {
                 return new EntitySize(2.04f, 2.04f, true);
             case 2:
                 return new EntitySize(4f, 4f, true);
-            case 3:
-                return new EntitySize(6f, 6f, true);
             default:
                 return super.getSize(poseIn);
         }
@@ -215,8 +209,7 @@ public class AmalgamationEntity extends MonsterEntity {
     public enum AmalgamationType {
         QUADRUPED,
         BLOB,
-        BIG,
-        HUGE
+        BIG
     }
 
 }

@@ -7,8 +7,7 @@ public class AmalgamationModelHolder extends AmalgamationModel {
     AmalgamationModel[] models = {
             new AmalgamationQuadrupedModel(),
             new AmalgamationBlobModel(),
-            new AmalgamationBigModel(),
-            new AmalgamationBlobModel()
+            new AmalgamationBigModel()
     };
 
     public AmalgamationModel getActualModel(AmalgamationEntity entity) {

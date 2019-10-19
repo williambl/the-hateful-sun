@@ -16,8 +16,7 @@ public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, Amalga
    private static final ResourceLocation[] TEXTURES = {
            new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/quadruped.png"),
            new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png"),
-           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/big.png"),
-           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png")
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/big.png")
    };
 
    public AmalgamationRenderer(EntityRendererManager renderManagerIn) {
