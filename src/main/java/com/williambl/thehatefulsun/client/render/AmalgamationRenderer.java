@@ -16,7 +16,7 @@ public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, Amalga
    private static final ResourceLocation[] TEXTURES = {
            new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/quadruped.png"),
            new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png"),
-           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png"),
+           new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/big.png"),
            new ResourceLocation(TheHatefulSun.MODID, "textures/entity/amalgamation/blob.png")
    };
 
@@ -38,22 +38,44 @@ public class AmalgamationRenderer extends MobRenderer<AmalgamationEntity, Amalga
    }
 
    private void setRotationAngles(AmalgamationEntity entity, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch) {
-      if (entity.getAmalgamationType() == 0) {
-         AmalgamationQuadrupedModel quadrupedModel = (AmalgamationQuadrupedModel) this.entityModel.getActualModel(entity);
-         quadrupedModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
-         quadrupedModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
-         quadrupedModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
-         quadrupedModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
-         quadrupedModel.Leg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-         quadrupedModel.Leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-         quadrupedModel.Leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-         quadrupedModel.Leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-      } else {
-         AmalgamationBlobModel blobModel = (AmalgamationBlobModel) this.entityModel.getActualModel(entity);
-         blobModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
-         blobModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
-         blobModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
-         blobModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+      switch (entity.getAmalgamationType()) {
+         case 0:
+            AmalgamationQuadrupedModel quadrupedModel = (AmalgamationQuadrupedModel) this.entityModel.getActualModel(entity);
+            quadrupedModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            quadrupedModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            quadrupedModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            quadrupedModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            quadrupedModel.Leg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            quadrupedModel.Leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            quadrupedModel.Leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            quadrupedModel.Leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            break;
+         case 1:
+            AmalgamationBlobModel blobModel = (AmalgamationBlobModel) this.entityModel.getActualModel(entity);
+            blobModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            blobModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            blobModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            blobModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            break;
+         case 2:
+            AmalgamationBigModel bigModel = (AmalgamationBigModel) this.entityModel.getActualModel(entity);
+            bigModel.Head.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            bigModel.Head.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            bigModel.Head2.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            bigModel.Head2.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            bigModel.Head3.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            bigModel.Head3.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            bigModel.Head4.rotateAngleX = headPitch * ((float) Math.PI / 180F);
+            bigModel.Head4.rotateAngleY = netHeadYaw * ((float) Math.PI / 180F);
+            bigModel.Leg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            bigModel.Leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            bigModel.Leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            bigModel.Leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            bigModel.Leg5.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            bigModel.Leg6.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            bigModel.Leg7.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+            bigModel.Leg8.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+            break;
       }
 
    }
