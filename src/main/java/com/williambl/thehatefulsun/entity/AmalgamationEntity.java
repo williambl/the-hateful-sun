@@ -6,9 +6,6 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -17,8 +14,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
 public class AmalgamationEntity extends MonsterEntity {
@@ -129,19 +124,6 @@ public class AmalgamationEntity extends MonsterEntity {
     }
 
     @Override
-    public boolean attackEntityAsMob(Entity entityIn) {
-        boolean flag = super.attackEntityAsMob(entityIn);
-        if (flag) {
-            float f = this.world.getDifficultyForLocation(new BlockPos(this)).getAdditionalDifficulty();
-            if (this.getHeldItemMainhand().isEmpty() && this.isBurning() && this.rand.nextFloat() < f * 0.3F) {
-                entityIn.setFire(2 * (int)f);
-            }
-        }
-
-        return flag;
-    }
-
-    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.ENTITY_ZOMBIE_AMBIENT;
     }
@@ -168,23 +150,6 @@ public class AmalgamationEntity extends MonsterEntity {
     @Override
     public CreatureAttribute getCreatureAttribute() {
         return CreatureAttribute.UNDEAD;
-    }
-
-    /**
-     * Gives armor or weapon for entity based on given DifficultyInstance
-     */
-    @Override
-    protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
-        super.setEquipmentBasedOnDifficulty(difficulty);
-        if (this.rand.nextFloat() < (this.world.getDifficulty() == Difficulty.HARD ? 0.05F : 0.01F)) {
-            int i = this.rand.nextInt(3);
-            if (i == 0) {
-                this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.IRON_SWORD));
-            } else {
-                this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.IRON_SHOVEL));
-            }
-        }
-
     }
 
     @Override
