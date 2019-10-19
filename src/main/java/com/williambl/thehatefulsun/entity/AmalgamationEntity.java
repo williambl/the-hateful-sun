@@ -189,18 +189,18 @@ public class AmalgamationEntity extends MonsterEntity {
 
     @Override
     protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
-        return 1.74F;
+        return getAmalgamationType() == 2 ? 2f : 1f;
     }
 
     @Override
     public EntitySize getSize(Pose poseIn) {
         switch (getAmalgamationType()) {
             case 0:
-                return new EntitySize(1.1f, 1.f, true);
+                return new EntitySize(1.1f, 1.3f, true);
             case 1:
-                return new EntitySize(2.04f, 2.04f, true);
+                return new EntitySize(2.04f, 1.04f, true);
             case 2:
-                return new EntitySize(4f, 4f, true);
+                return new EntitySize(4f, 2.5f, true);
             default:
                 return super.getSize(poseIn);
         }
