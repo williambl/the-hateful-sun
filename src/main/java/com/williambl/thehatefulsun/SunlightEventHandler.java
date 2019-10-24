@@ -4,8 +4,8 @@ import com.williambl.thehatefulsun.entity.AmalgamationEntity;
 import com.williambl.thehatefulsun.entity.ModEntities;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.passive.PigEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
@@ -40,7 +40,7 @@ public class SunlightEventHandler {
         if (!TheHatefulSun.isSunHateful(event.getEntity().world)) return;
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
-        if (event.getEntity() instanceof PigEntity || event.getEntity() instanceof CowEntity) {
+        if (event.getEntity() instanceof AnimalEntity || event.getEntity() instanceof MobEntity) {
             event.getEntity().remove();
             AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
             newEntity.setPositionAndRotation(
@@ -50,20 +50,30 @@ public class SunlightEventHandler {
                     event.getEntity().rotationYaw,
                     event.getEntity().rotationPitch
             );
-            newEntity.setAmalgamationType(AmalgamationEntity.AmalgamationType.QUADRUPED.ordinal());
+
+            if (event.getEntity() instanceof AnimalEntity)
+                newEntity.setAmalgamationType(AmalgamationEntity.AmalgamationType.QUADRUPED.ordinal());
+            else
+                newEntity.setAmalgamationType(AmalgamationEntity.AmalgamationType.BLOB.ordinal());
 
             event.getEntity().world.addEntity(newEntity);
 
             for (int i = 0; i < 10; i++) {
                 event.getEntity().world.addParticle(
                         ParticleTypes.CLOUD,
-                        event.getEntity().posX+event.getEntity().world.rand.nextDouble()-0.5,
+                        event.getEntity().posX + event.getEntity().world.rand.nextDouble() - 0.5,
                         event.getEntity().posY,
-                        event.getEntity().posZ+event.getEntity().world.rand.nextDouble()-0.5,
+                        event.getEntity().posZ + event.getEntity().world.rand.nextDouble() - 0.5,
                         0.0,
                         0.1,
                         0.0
                 );
+            }
+        }
+
+        if (event.getEntity() instanceof AmalgamationEntity) {
+            if (((AmalgamationEntity)event.getEntity()).ticksExisted > 12000 && ((AmalgamationEntity)event.getEntity()).getAmalgamationType() != 2) {
+                ((AmalgamationEntity)event.getEntity()).setAmalgamationType(AmalgamationEntity.AmalgamationType.BIG.ordinal());
             }
         }
     }
