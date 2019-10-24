@@ -66,7 +66,7 @@ public class TheHatefulSun
     }
 
     public static boolean isSunHateful(World world) {
-        return world.isDaytime() && world.getCurrentMoonPhaseFactor() == 1f;
+        return world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
     }
 
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
