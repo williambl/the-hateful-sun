@@ -24,7 +24,7 @@ public class SunlightEventHandler {
     public static void killPlayer(TickEvent.PlayerTickEvent event) {
         if (event.side == LogicalSide.CLIENT) return;
         if (event.player.isCreative()) return;
-        if (!event.player.world.isDaytime()) return;
+        if (!TheHatefulSun.isSunHateful(event.player.world)) return;
 
         if (event.player.world.canBlockSeeSky(event.player.getPosition().offset(Direction.UP))) {
             event.player.attackEntityFrom(
@@ -37,7 +37,7 @@ public class SunlightEventHandler {
     @SubscribeEvent
     public static void mutateMobs(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntity().world.isRemote) return;
-        if (!event.getEntity().world.isDaytime()) return;
+        if (!TheHatefulSun.isSunHateful(event.getEntity().world)) return;
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
         if (event.getEntity() instanceof PigEntity || event.getEntity() instanceof CowEntity) {
@@ -71,8 +71,9 @@ public class SunlightEventHandler {
     @SubscribeEvent
     public static void mutatePumpkin(BlockEvent.CropGrowEvent.Post event) {
         if (event.getWorld().isRemote()) return;
-        if (!event.getWorld().getWorld().isDaytime()) return;
+        if (!TheHatefulSun.isSunHateful(event.getWorld().getWorld())) return;
         if (!event.getWorld().canBlockSeeSky(event.getPos())) return;
+
         if (event.getState().getBlock() == Blocks.PUMPKIN_STEM) {
             for (int i = 0; i < event.getWorld().getRandom().nextInt(3)+1; i++) {
                 MutatedPumpkinEntity entity = new MutatedPumpkinEntity(ModEntities.mutatedPumpkin, event.getWorld().getWorld());

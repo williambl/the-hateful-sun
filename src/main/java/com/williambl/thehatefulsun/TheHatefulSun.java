@@ -7,6 +7,7 @@ import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -62,6 +63,10 @@ public class TheHatefulSun
 
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
+    }
+
+    public static boolean isSunHateful(World world) {
+        return world.isDaytime() && world.getCurrentMoonPhaseFactor() == 1f;
     }
 
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
