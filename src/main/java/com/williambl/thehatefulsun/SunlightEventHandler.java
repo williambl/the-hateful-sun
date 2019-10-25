@@ -43,7 +43,7 @@ public class SunlightEventHandler {
         if (!TheHatefulSun.isSunHateful(event.getEntity().world)) return;
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
-        if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity) && !(event.getEntity() instanceof AbstractFishEntity)) {
+        if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity) && !(event.getEntity() instanceof AbstractFishEntity) && !(event.getEntity() instanceof MutatedPumpkinEntity)) {
             event.getEntity().remove();
             AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
             newEntity.setPositionAndRotation(
