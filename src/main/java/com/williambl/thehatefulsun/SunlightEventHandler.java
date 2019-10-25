@@ -13,6 +13,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -99,6 +100,36 @@ public class SunlightEventHandler {
                             event.getPos().getX() + event.getWorld().getWorld().rand.nextDouble() - 0.5,
                             event.getPos().getY(),
                             event.getPos().getZ() + event.getWorld().getWorld().rand.nextDouble() - 0.5,
+                            0.0,
+                            0.1,
+                            0.0
+                    );
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void mutatePlayer(LivingDeathEvent event) {
+        if (event.getEntity() instanceof PlayerEntity) {
+            if (event.getSource().damageType.equals("sunlight")) {
+                AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
+                newEntity.setPositionAndRotation(
+                        event.getEntity().posX,
+                        event.getEntity().posY,
+                        event.getEntity().posZ,
+                        event.getEntity().rotationYaw,
+                        event.getEntity().rotationPitch
+                );
+                newEntity.setAmalgamationType(AmalgamationEntity.AmalgamationType.BLOB.ordinal());
+                event.getEntity().world.addEntity(newEntity);
+
+                for (int i = 0; i < 10; i++) {
+                    event.getEntity().world.addParticle(
+                            ParticleTypes.CLOUD,
+                            event.getEntity().posX + event.getEntity().world.rand.nextDouble() - 0.5,
+                            event.getEntity().posY,
+                            event.getEntity().posZ + event.getEntity().world.rand.nextDouble() - 0.5,
                             0.0,
                             0.1,
                             0.0
