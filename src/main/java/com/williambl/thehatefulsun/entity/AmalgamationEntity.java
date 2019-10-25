@@ -44,17 +44,17 @@ public class AmalgamationEntity extends MonsterEntity {
             case 0:
                 this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
                 this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0);
-                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0);
+                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0);
                 break;
             case 1:
                 this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.15);
                 this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(7.0);
-                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0);
+                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0);
                 break;
             case 2:
                 this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
                 this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0);
-                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0);
+                this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(150.0);
                 break;
             default:
                 break;
