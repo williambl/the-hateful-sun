@@ -1,17 +1,18 @@
 modLoader="javafml"
 loaderVersion="[28,)"
-#issueTrackerURL="http://my.issue.tracker/" #optional
+issueTrackerURL="http://github.com/williambl/the-hateful-sun/issues/"
 
 [[mods]]
 modId="thehatefulsun"
 version="${file.jarVersion}"
 displayName="The Hateful Sun"
 #updateJSONURL=""
-#displayURL="http://williambl.com/"
-logoFile=""
+displayURL="https://www.curseforge.com/minecraft/mc-mods/the-hateful-sun"
+logoFile="logo.png"
 credits=""
 authors="Willbl3pic"
 description='''
+When it's the day of a new moon, the sun will affect living beings!
 '''
 [[dependencies.thehatefulsun]] #optional
     modId="forge" #mandatory
