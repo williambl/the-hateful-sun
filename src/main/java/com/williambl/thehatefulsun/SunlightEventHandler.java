@@ -6,6 +6,7 @@ import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.fish.AbstractFishEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.particles.ParticleTypes;
@@ -41,7 +42,7 @@ public class SunlightEventHandler {
         if (!TheHatefulSun.isSunHateful(event.getEntity().world)) return;
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
-        if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity)) {
+        if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity) && !(event.getEntity() instanceof AbstractFishEntity)) {
             event.getEntity().remove();
             AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
             newEntity.setPositionAndRotation(
