@@ -12,6 +12,7 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -135,6 +136,16 @@ public class SunlightEventHandler {
                             0.0
                     );
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onWorldTick(TickEvent.WorldTickEvent event) {
+        System.out.println(event.world.getDayTime());
+        if (event.world.getDayTime() % 24000 == 0) {
+            if (event.world.getCurrentMoonPhaseFactor() == 0f) {
+                event.world.getPlayers().forEach(it -> it.sendMessage(new StringTextComponent("The sun is dangerous today!")));
             }
         }
     }
