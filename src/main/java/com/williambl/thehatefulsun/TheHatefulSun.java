@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -66,7 +67,7 @@ public class TheHatefulSun
     }
 
     public static boolean isSunHateful(World world) {
-        return world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
+        return world.getDimension().getType() == DimensionType.OVERWORLD && world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
     }
 
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
