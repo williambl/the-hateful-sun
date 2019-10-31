@@ -4,7 +4,6 @@ import com.williambl.thehatefulsun.client.render.AmalgamationRenderer;
 import com.williambl.thehatefulsun.client.render.MutatedPumpkinRenderer;
 import com.williambl.thehatefulsun.entity.AmalgamationEntity;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
-import net.minecraft.block.Block;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;
@@ -72,12 +71,6 @@ public class TheHatefulSun
 
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
-        }
-
         @SubscribeEvent
         public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
             event.getRegistry().register(
