@@ -33,7 +33,7 @@ public class SunlightEventHandler {
         if (event.player.world.canBlockSeeSky(event.player.getPosition().offset(Direction.UP))) {
             event.player.attackEntityFrom(
                     new DamageSource("sunlight").setDamageBypassesArmor(),
-                    event.player.getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty() ? 5.0f : 1.0f
+                    event.player.getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty() ? 0.25f : 0.05f
             );
         }
     }
@@ -45,6 +45,8 @@ public class SunlightEventHandler {
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
         if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity) && !(event.getEntity() instanceof AbstractFishEntity) && !(event.getEntity() instanceof MutatedPumpkinEntity)) {
+            if (event.getEntity().getEntityId() % 4 != 0)
+                return;
             event.getEntity().remove();
             AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
             newEntity.setPositionAndRotation(
