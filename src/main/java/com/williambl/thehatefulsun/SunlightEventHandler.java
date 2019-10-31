@@ -142,7 +142,6 @@ public class SunlightEventHandler {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
-        System.out.println(event.world.getDayTime());
         if (event.world.getDayTime() % 24000 == 0) {
             if (event.world.getCurrentMoonPhaseFactor() == 0f) {
                 event.world.getPlayers().forEach(it -> it.sendMessage(new StringTextComponent("The sun is dangerous today!")));
