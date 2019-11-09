@@ -1,0 +1,16 @@
+[
+{
+  "modid": "thehatefulsun",
+  "name": "The Hateful Sun",
+  "description": "When it's the day of a new moon, the sun will affect living beings!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/the-hateful-sun",
+  "updateUrl": "",
+  "authorList": ["Willbl3pic"],
+  "credits": "The Forge and FML guys, for making this example",
+  "logoFile": "logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

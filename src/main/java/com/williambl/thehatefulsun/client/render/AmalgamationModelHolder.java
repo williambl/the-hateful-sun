@@ -1,6 +1,7 @@
 package com.williambl.thehatefulsun.client.render;
 
 import com.williambl.thehatefulsun.entity.AmalgamationEntity;
+import net.minecraft.entity.Entity;
 
 public class AmalgamationModelHolder extends AmalgamationModel {
 
@@ -15,7 +16,7 @@ public class AmalgamationModelHolder extends AmalgamationModel {
     }
 
     @Override
-    public void render(AmalgamationEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        getActualModel(entityIn).render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+    public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+        getActualModel((AmalgamationEntity)entityIn).render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
     }
 }

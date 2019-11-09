@@ -4,91 +4,56 @@ import com.williambl.thehatefulsun.client.render.AmalgamationRenderer;
 import com.williambl.thehatefulsun.client.render.MutatedPumpkinRenderer;
 import com.williambl.thehatefulsun.entity.AmalgamationEntity;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(TheHatefulSun.MODID)
+@Mod(modid=TheHatefulSun.MODID)
 public class TheHatefulSun
 {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "thehatefulsun";
 
-    public TheHatefulSun() {
-        // Register the setup method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        // Register the enqueueIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-        // Register the processIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
-        // Register the doClientStuff method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
-
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    private void setup(final FMLCommonSetupEvent event)
-    {
-    }
-
-    private void doClientStuff(final FMLClientSetupEvent event) {
+    @Mod.EventHandler
+    public static void preInit(final FMLPreInitializationEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(MutatedPumpkinEntity.class, MutatedPumpkinRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(AmalgamationEntity.class, AmalgamationRenderer::new);
     }
 
-    private void enqueueIMC(final InterModEnqueueEvent event)
-    {
-    }
-
-    private void processIMC(final InterModProcessEvent event)
-    {
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
-    }
-
     public static boolean isSunHateful(World world) {
-        return world.getDimension().getType() == DimensionType.OVERWORLD && world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
+        return world.provider.getDimensionType() == DimensionType.OVERWORLD && world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
     }
 
-    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber()
     public static class RegistryEvents {
         @SubscribeEvent
-        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
+        public static void registerEntities(final RegistryEvent.Register<EntityEntry> event) {
+            int id = 0;
             event.getRegistry().register(
-                    EntityType.Builder.create(MutatedPumpkinEntity::new, EntityClassification.MONSTER)
-                            .setUpdateInterval(1)
-                            .setTrackingRange(64)
-                            .setShouldReceiveVelocityUpdates(true)
-                            .size(2.04f, 2.04f)
-                            .build("mutated_pumpkin").setRegistryName("mutated_pumpkin")
+                    EntityEntryBuilder.create().entity(MutatedPumpkinEntity.class)
+                            .tracker(64, 1, true)
+                            .id("mutated_pumpkin", id++)
+                            .name("mutated_pumpkin")
+                            .build()
             );
 
             event.getRegistry().register(
-                    EntityType.Builder.create(AmalgamationEntity::new, EntityClassification.MONSTER)
-                    .setUpdateInterval(1)
-                    .setTrackingRange(64)
-                    .setShouldReceiveVelocityUpdates(true)
-                    .size(1.1f, 1)
-                    .build("amalgamation").setRegistryName("amalgamation")
+                    EntityEntryBuilder.create().entity(AmalgamationEntity.class)
+                    .tracker(64, 1, true)
+                    .id("amalgamation", id++)
+                    .name("amalgamation")
+                    .build()
             );
         }
 

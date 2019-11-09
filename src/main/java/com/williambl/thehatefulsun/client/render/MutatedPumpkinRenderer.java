@@ -2,19 +2,16 @@ package com.williambl.thehatefulsun.client.render;
 
 import com.williambl.thehatefulsun.TheHatefulSun;
 import com.williambl.thehatefulsun.entity.MutatedPumpkinEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 
-@OnlyIn(Dist.CLIENT)
-public class MutatedPumpkinRenderer extends MobRenderer<MutatedPumpkinEntity, MutatedPumpkinModel> {
+public class MutatedPumpkinRenderer extends RenderLiving<MutatedPumpkinEntity> {
    private static final ResourceLocation TEXTURE = new ResourceLocation(TheHatefulSun.MODID, "textures/entity/mutated_pumpkin/mutated_pumpkin.png");
 
-   public MutatedPumpkinRenderer(EntityRendererManager renderManagerIn) {
+   public MutatedPumpkinRenderer(RenderManager renderManagerIn) {
       super(renderManagerIn, new MutatedPumpkinModel(), 0.25F);
    }
 

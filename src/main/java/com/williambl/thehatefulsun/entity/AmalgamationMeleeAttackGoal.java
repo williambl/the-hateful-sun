@@ -1,15 +1,16 @@
 package com.williambl.thehatefulsun.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIAttackMelee;
 
-public class AmalgamationMeleeAttackGoal extends MeleeAttackGoal {
+public class AmalgamationMeleeAttackGoal extends EntityAIAttackMelee {
 
     public AmalgamationMeleeAttackGoal(AmalgamationEntity creature, double speedIn, boolean useLongMemory) {
         super(creature, speedIn, useLongMemory);
     }
 
-    protected double getAttackReachSqr(LivingEntity attackTarget) {
-        return this.attacker.getWidth() * this.attacker.getWidth() + attackTarget.getWidth() + 4.0f;
+    @Override
+    protected double getAttackReachSqr(EntityLivingBase attackTarget) {
+        return this.attacker.width * this.attacker.width + attackTarget.width + 4.0f;
     }
 }

@@ -1,15 +1,15 @@
 package com.williambl.thehatefulsun.entity;
 
 import com.williambl.thehatefulsun.TheHatefulSun;
-import net.minecraft.entity.EntityType;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@ObjectHolder(TheHatefulSun.MODID)
+@GameRegistry.ObjectHolder(TheHatefulSun.MODID)
 public class ModEntities {
 
-    @ObjectHolder("amalgamation")
-    public static EntityType amalgamation;
+    @GameRegistry.ObjectHolder("amalgamation")
+    public static EntityEntry amalgamation;
 
-    @ObjectHolder("mutated_pumpkin")
-    public static EntityType mutatedPumpkin;
+    @GameRegistry.ObjectHolder("mutated_pumpkin")
+    public static EntityEntry mutatedPumpkin;
 }

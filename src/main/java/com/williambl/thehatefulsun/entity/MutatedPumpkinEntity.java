@@ -1,104 +1,106 @@
 package com.williambl.thehatefulsun.entity;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.Effects;
+import com.williambl.thehatefulsun.TheHatefulSun;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAIFindEntityNearest;
+import net.minecraft.entity.ai.EntityAIFindEntityNearestPlayer;
+import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
-import java.util.EnumSet;
+import java.util.Objects;
 
-public class MutatedPumpkinEntity extends MobEntity {
+public class MutatedPumpkinEntity extends EntityMob {
 
     public float squishAmount;
     public float squishFactor;
     public float prevSquishFactor;
     private boolean wasOnGround;
 
-    public MutatedPumpkinEntity(EntityType<? extends MutatedPumpkinEntity> type, World worldIn) {
-        super(type, worldIn);
-        this.moveController = new MutatedPumpkinEntity.MoveHelperController(this);
+    public MutatedPumpkinEntity(World worldIn) {
+        super(worldIn);
+        this.moveHelper = new MutatedPumpkinEntity.MoveHelperController(this);
     }
 
     @Override
-    protected void registerGoals() {
-        this.goalSelector.addGoal(1, new MutatedPumpkinEntity.FloatGoal(this));
-        this.goalSelector.addGoal(2, new MutatedPumpkinEntity.AttackGoal(this));
-        this.goalSelector.addGoal(3, new MutatedPumpkinEntity.FaceRandomGoal(this));
-        this.goalSelector.addGoal(5, new MutatedPumpkinEntity.HopGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, (target) -> Math.abs(target.posY - this.posY) <= 4.0D));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolemEntity.class, true));
+    protected void initEntityAI() {
+        this.tasks.addTask(1, new MutatedPumpkinEntity.FloatTask(this));
+        this.tasks.addTask(2, new MutatedPumpkinEntity.AttackTask(this));
+        this.tasks.addTask(3, new MutatedPumpkinEntity.FaceRandomTask(this));
+        this.tasks.addTask(5, new MutatedPumpkinEntity.HopTask(this));
+        this.targetTasks.addTask(1, new EntityAIFindEntityNearestPlayer(this));
+        this.targetTasks.addTask(3, new EntityAIFindEntityNearest(this, EntityIronGolem.class));
     }
 
     @Override
-    public void writeAdditional(CompoundNBT compound) {
-        super.writeAdditional(compound);
-        compound.putBoolean("wasOnGround", this.wasOnGround);
+    public void writeEntityToNBT(NBTTagCompound compound) {
+        super.writeEntityToNBT(compound);
+        compound.setBoolean("wasOnGround", this.wasOnGround);
     }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
     @Override
-    public void readAdditional(CompoundNBT compound) {
-        super.readAdditional(compound);
+    public void readEntityFromNBT(NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
         this.wasOnGround = compound.getBoolean("wasOnGround");
     }
 
-    protected IParticleData getSquishParticle() {
-        return new ItemParticleData(ParticleTypes.ITEM, new ItemStack(Item.getItemFromBlock(Blocks.PUMPKIN)));
+    protected EnumParticleTypes getSquishParticle() {
+        return EnumParticleTypes.ITEM_CRACK;
     }
 
     /**
      * Called to update the entity's position/logic.
      */
     @Override
-    public void tick() {
-        if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL) {
-            this.remove(); //Forge: Kill entity with notification to caps/subclasses.
+    public void onUpdate() {
+        if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
+        {
+            this.isDead = true;
         }
 
         this.squishFactor += (this.squishAmount - this.squishFactor) * 0.5F;
         this.prevSquishFactor = this.squishFactor;
-        super.tick();
-        if (this.onGround && !this.wasOnGround) {
+        super.onUpdate();
 
+        if (this.onGround && !this.wasOnGround)
+        {
             int i = 4;
-            for(int j = 0; j < i * 8; ++j) {
+            for (int j = 0; j < i * 8; ++j)
+            {
                 float f = this.rand.nextFloat() * ((float)Math.PI * 2F);
                 float f1 = this.rand.nextFloat() * 0.5F + 0.5F;
                 float f2 = MathHelper.sin(f) * (float)i * 0.5F * f1;
                 float f3 = MathHelper.cos(f) * (float)i * 0.5F * f1;
                 World world = this.world;
-                IParticleData iparticledata = this.getSquishParticle();
+                EnumParticleTypes enumparticletypes = this.getSquishParticle();
                 double d0 = this.posX + (double)f2;
                 double d1 = this.posZ + (double)f3;
-                world.addParticle(iparticledata, d0, this.getBoundingBox().minY, d1, 0.0D, 0.0D, 0.0D);
+                world.spawnParticle(enumparticletypes, d0, this.getEntityBoundingBox().minY, d1, 0.0D, 0.0D, 0.0D);
             }
 
             this.playSound(this.getSquishSound(), this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) / 0.8F);
             this.squishAmount = -0.5F;
-        } else if (!this.onGround && this.wasOnGround) {
+        }
+        else if (!this.onGround && this.wasOnGround)
+        {
             this.squishAmount = 1.0F;
         }
 
@@ -117,19 +119,14 @@ public class MutatedPumpkinEntity extends MobEntity {
         return this.rand.nextInt(20) + 10;
     }
 
-    @Override
-    public EntityType<? extends MutatedPumpkinEntity> getType() {
-        return (EntityType<? extends MutatedPumpkinEntity>) super.getType();
-    }
-
     /**
      * Applies a velocity to the entities, to push them away from eachother.
      */
     @Override
     public void applyEntityCollision(Entity entityIn) {
         super.applyEntityCollision(entityIn);
-        if (entityIn instanceof IronGolemEntity && this.canDamagePlayer()) {
-            this.dealDamage((LivingEntity)entityIn);
+        if (entityIn instanceof EntityIronGolem && this.canDamagePlayer()) {
+            this.dealDamage((EntityIronGolem)entityIn);
         }
     }
 
@@ -137,24 +134,19 @@ public class MutatedPumpkinEntity extends MobEntity {
      * Called by a player entity when they collide with an entity
      */
     @Override
-    public void onCollideWithPlayer(PlayerEntity entityIn) {
+    public void onCollideWithPlayer(EntityPlayer entityIn) {
         if (this.canDamagePlayer()) {
             this.dealDamage(entityIn);
         }
     }
 
-    protected void dealDamage(LivingEntity entityIn) {
-        if (this.isAlive()) {
+    protected void dealDamage(EntityLivingBase entityIn) {
+        if (this.isEntityAlive()) {
             if (this.getDistanceSq(entityIn) < 5.76 && this.canEntityBeSeen(entityIn) && entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)this.getAttackStrength())) {
                 this.playSound(SoundEvents.BLOCK_WOOD_BREAK, 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
                 this.applyEnchantments(this, entityIn);
             }
         }
-    }
-
-    @Override
-    protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
-        return 0.625F * sizeIn.height;
     }
 
     /**
@@ -173,7 +165,7 @@ public class MutatedPumpkinEntity extends MobEntity {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return SoundEvents.BLOCK_PUMPKIN_CARVE;
+        return SoundEvents.BLOCK_WOOD_HIT;
     }
 
     @Override
@@ -182,12 +174,12 @@ public class MutatedPumpkinEntity extends MobEntity {
     }
 
     protected SoundEvent getSquishSound() {
-        return SoundEvents.BLOCK_PUMPKIN_CARVE;
+        return SoundEvents.BLOCK_WOOD_HIT;
     }
 
     @Override
     protected ResourceLocation getLootTable() {
-        return this.getType().getLootTable();
+        return new ResourceLocation(TheHatefulSun.MODID, "entities/amalgamation");
     }
 
     /**
@@ -211,53 +203,44 @@ public class MutatedPumpkinEntity extends MobEntity {
      * Causes this entity to do an upwards motion (jumping).
      */
     @Override
-    protected void jump() {
-        Vec3d vec3d = this.getMotion();
-        this.setMotion(vec3d.x, (double)0.42F, vec3d.z);
+    protected void jump()
+    {
+        this.motionY = 0.41999998688697815D;
         this.isAirBorne = true;
-    }
-
-    @Nullable
-    @Override
-    public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-        return super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
     protected SoundEvent getJumpSound() {
         return SoundEvents.BLOCK_WOOD_STEP;
     }
 
-    @Override
-    public EntitySize getSize(Pose poseIn) {
-        return super.getSize(poseIn);
-    }
-
-    static class AttackGoal extends Goal {
+    static class AttackTask extends EntityAIBase {
         private final MutatedPumpkinEntity mutatedPumpkin;
         private int growTieredTimer;
 
-        public AttackGoal(MutatedPumpkinEntity mutatedPumpkinIn) {
+        public AttackTask(MutatedPumpkinEntity mutatedPumpkinIn) {
             this.mutatedPumpkin = mutatedPumpkinIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.LOOK));
+            this.setMutexBits(2);
         }
 
         /**
          * Returns whether the EntityAIBase should begin execution.
          */
+        @Override
         public boolean shouldExecute() {
-            LivingEntity livingentity = this.mutatedPumpkin.getAttackTarget();
+            EntityLivingBase livingentity = this.mutatedPumpkin.getAttackTarget();
             if (livingentity == null) {
                 return false;
-            } else if (!livingentity.isAlive()) {
+            } else if (!livingentity.isEntityAlive()) {
                 return false;
             } else {
-                return livingentity instanceof PlayerEntity && ((PlayerEntity)livingentity).abilities.disableDamage ? false : this.mutatedPumpkin.getMoveHelper() instanceof MutatedPumpkinEntity.MoveHelperController;
+                return (!(livingentity instanceof EntityPlayer) || !((EntityPlayer) livingentity).capabilities.disableDamage) && this.mutatedPumpkin.getMoveHelper() instanceof MoveHelperController;
             }
         }
 
         /**
          * Execute a one shot task or start executing a continuous task
          */
+        @Override
         public void startExecuting() {
             this.growTieredTimer = 300;
             super.startExecuting();
@@ -266,13 +249,14 @@ public class MutatedPumpkinEntity extends MobEntity {
         /**
          * Returns whether an in-progress EntityAIBase should continue executing
          */
+        @Override
         public boolean shouldContinueExecuting() {
-            LivingEntity livingentity = this.mutatedPumpkin.getAttackTarget();
+            EntityLivingBase livingentity = this.mutatedPumpkin.getAttackTarget();
             if (livingentity == null) {
                 return false;
-            } else if (!livingentity.isAlive()) {
+            } else if (!livingentity.isEntityAlive()) {
                 return false;
-            } else if (livingentity instanceof PlayerEntity && ((PlayerEntity)livingentity).abilities.disableDamage) {
+            } else if (livingentity instanceof EntityPlayer && ((EntityPlayer)livingentity).capabilities.disableDamage) {
                 return false;
             } else {
                 return --this.growTieredTimer > 0;
@@ -282,33 +266,36 @@ public class MutatedPumpkinEntity extends MobEntity {
         /**
          * Keep ticking a continuous task that has already been started
          */
-        public void tick() {
+        @Override
+        public void updateTask() {
             this.mutatedPumpkin.faceEntity(this.mutatedPumpkin.getAttackTarget(), 10.0F, 10.0F);
             ((MutatedPumpkinEntity.MoveHelperController)this.mutatedPumpkin.getMoveHelper()).setDirection(this.mutatedPumpkin.rotationYaw, this.mutatedPumpkin.canDamagePlayer());
         }
     }
 
-    static class FaceRandomGoal extends Goal {
+    static class FaceRandomTask extends EntityAIBase {
         private final MutatedPumpkinEntity mutatedPumpkin;
         private float chosenDegrees;
         private int nextRandomizeTime;
 
-        public FaceRandomGoal(MutatedPumpkinEntity mutatedPumpkinIn) {
+        public FaceRandomTask(MutatedPumpkinEntity mutatedPumpkinIn) {
             this.mutatedPumpkin = mutatedPumpkinIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.LOOK));
+            this.setMutexBits(2);
         }
 
         /**
          * Returns whether the EntityAIBase should begin execution.
          */
+        @Override
         public boolean shouldExecute() {
-            return this.mutatedPumpkin.getAttackTarget() == null && (this.mutatedPumpkin.onGround || this.mutatedPumpkin.isInWater() || this.mutatedPumpkin.isInLava() || this.mutatedPumpkin.isPotionActive(Effects.LEVITATION)) && this.mutatedPumpkin.getMoveHelper() instanceof MutatedPumpkinEntity.MoveHelperController;
+            return this.mutatedPumpkin.getAttackTarget() == null && (this.mutatedPumpkin.onGround || this.mutatedPumpkin.isInWater() || this.mutatedPumpkin.isInLava() || this.mutatedPumpkin.isPotionActive(Objects.requireNonNull(Potion.getPotionById(25)))) && this.mutatedPumpkin.getMoveHelper() instanceof MutatedPumpkinEntity.MoveHelperController;
         }
 
         /**
          * Keep ticking a continuous task that has already been started
          */
-        public void tick() {
+        @Override
+        public void updateTask() {
             if (--this.nextRandomizeTime <= 0) {
                 this.nextRandomizeTime = 40 + this.mutatedPumpkin.getRNG().nextInt(60);
                 this.chosenDegrees = (float)this.mutatedPumpkin.getRNG().nextInt(360);
@@ -318,18 +305,19 @@ public class MutatedPumpkinEntity extends MobEntity {
         }
     }
 
-    static class FloatGoal extends Goal {
+    static class FloatTask extends EntityAIBase {
         private final MutatedPumpkinEntity mutatedPumpkin;
 
-        public FloatGoal(MutatedPumpkinEntity mutatedPumpkinIn) {
+        public FloatTask(MutatedPumpkinEntity mutatedPumpkinIn) {
             this.mutatedPumpkin = mutatedPumpkinIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.JUMP, Goal.Flag.MOVE));
-            mutatedPumpkinIn.getNavigator().setCanSwim(true);
+            this.setMutexBits(5);
+            ((PathNavigateGround)mutatedPumpkinIn.getNavigator()).setCanSwim(true);
         }
 
         /**
          * Returns whether the EntityAIBase should begin execution.
          */
+        @Override
         public boolean shouldExecute() {
             return (this.mutatedPumpkin.isInWater() || this.mutatedPumpkin.isInLava()) && this.mutatedPumpkin.getMoveHelper() instanceof MutatedPumpkinEntity.MoveHelperController;
         }
@@ -337,39 +325,42 @@ public class MutatedPumpkinEntity extends MobEntity {
         /**
          * Keep ticking a continuous task that has already been started
          */
-        public void tick() {
+        @Override
+        public void updateTask() {
             if (this.mutatedPumpkin.getRNG().nextFloat() < 0.8F) {
-                this.mutatedPumpkin.getJumpController().setJumping();
+                this.mutatedPumpkin.getJumpHelper().setJumping();
             }
 
             ((MutatedPumpkinEntity.MoveHelperController)this.mutatedPumpkin.getMoveHelper()).setSpeed(1.2D);
         }
     }
 
-    static class HopGoal extends Goal {
+    static class HopTask extends EntityAIBase {
         private final MutatedPumpkinEntity mutatedPumpkin;
 
-        public HopGoal(MutatedPumpkinEntity mutatedPumpkinIn) {
+        public HopTask(MutatedPumpkinEntity mutatedPumpkinIn) {
             this.mutatedPumpkin = mutatedPumpkinIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.JUMP, Goal.Flag.MOVE));
+            this.setMutexBits(5);
         }
 
         /**
          * Returns whether the EntityAIBase should begin execution.
          */
+        @Override
         public boolean shouldExecute() {
-            return !this.mutatedPumpkin.isPassenger();
+            return true;
         }
 
         /**
          * Keep ticking a continuous task that has already been started
          */
-        public void tick() {
+        @Override
+        public void updateTask() {
             ((MutatedPumpkinEntity.MoveHelperController)this.mutatedPumpkin.getMoveHelper()).setSpeed(1.0D);
         }
     }
 
-    static class MoveHelperController extends MovementController {
+    static class MoveHelperController extends EntityMoveHelper {
         private float yRot;
         private int jumpDelay;
         private final MutatedPumpkinEntity mutatedPumpkin;
@@ -388,34 +379,34 @@ public class MutatedPumpkinEntity extends MobEntity {
 
         public void setSpeed(double speedIn) {
             this.speed = speedIn;
-            this.action = MovementController.Action.MOVE_TO;
+            this.action = Action.MOVE_TO;
         }
 
         public void tick() {
-            this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, this.yRot, 90.0F);
-            this.mob.rotationYawHead = this.mob.rotationYaw;
-            this.mob.renderYawOffset = this.mob.rotationYaw;
-            if (this.action != MovementController.Action.MOVE_TO) {
-                this.mob.setMoveForward(0.0F);
+            this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, this.yRot, 90.0F);
+            this.entity.rotationYawHead = this.entity.rotationYaw;
+            this.entity.renderYawOffset = this.entity.rotationYaw;
+            if (this.action != Action.MOVE_TO) {
+                this.entity.setMoveForward(0.0F);
             } else {
-                this.action = MovementController.Action.WAIT;
-                if (this.mob.onGround) {
-                    this.mob.setAIMoveSpeed((float)(this.speed * this.mob.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue()));
+                this.action = Action.WAIT;
+                if (this.entity.onGround) {
+                    this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
                     if (this.jumpDelay-- <= 0) {
                         this.jumpDelay = this.mutatedPumpkin.getJumpDelay();
                         if (this.isAggressive) {
                             this.jumpDelay /= 3;
                         }
 
-                        this.mutatedPumpkin.getJumpController().setJumping();
+                        this.mutatedPumpkin.getJumpHelper().setJumping();
                         this.mutatedPumpkin.playSound(this.mutatedPumpkin.getJumpSound(), this.mutatedPumpkin.getSoundVolume(), ((this.mutatedPumpkin.getRNG().nextFloat() - this.mutatedPumpkin.getRNG().nextFloat()) * 0.2F + 1.0F) * 0.8F);
                     } else {
                         this.mutatedPumpkin.moveStrafing = 0.0F;
                         this.mutatedPumpkin.moveForward = 0.0F;
-                        this.mob.setAIMoveSpeed(0.0F);
+                        this.entity.setAIMoveSpeed(0.0F);
                     }
                 } else {
-                    this.mob.setAIMoveSpeed((float)(this.speed * this.mob.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue()));
+                    this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
                 }
 
             }
