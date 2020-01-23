@@ -11,8 +11,10 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -42,6 +44,8 @@ public class TheHatefulSun
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -66,7 +70,9 @@ public class TheHatefulSun
     }
 
     public static boolean isSunHateful(World world) {
-        return world.getDimension().getType() == DimensionType.OVERWORLD && world.isDaytime() && world.getCurrentMoonPhaseFactor() == 0f;
+        return world.getDimension().getType() == DimensionType.OVERWORLD
+                && world.isDaytime()
+                && (Config.onlyOnFullMoon || world.getCurrentMoonPhaseFactor() == 0f);
     }
 
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -90,6 +96,14 @@ public class TheHatefulSun
                     .size(1.1f, 1)
                     .build("amalgamation").setRegistryName("amalgamation")
             );
+        }
+
+        @SubscribeEvent
+        public static void registerConfig(ModConfig.ModConfigEvent event) {
+            if (event.getConfig().getSpec() == Config.SERVER_SPEC) {
+                Config.loadConfig(event.getConfig().getSpec(), event.getConfig().getFullPath());
+                Config.refreshServer();
+            }
         }
 
     }

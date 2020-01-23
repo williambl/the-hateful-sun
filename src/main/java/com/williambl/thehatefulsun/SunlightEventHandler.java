@@ -34,7 +34,7 @@ public class SunlightEventHandler {
         if (event.player.world.canBlockSeeSky(event.player.getPosition().offset(Direction.UP))) {
             event.player.attackEntityFrom(
                     new DamageSource("sunlight").setDamageBypassesArmor(),
-                    event.player.getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty() ? 0.25f : 0.05f
+                    event.player.getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty() ? Config.sunDamagePerTick : Config.sunDamagePerTickWithHelmet
             );
         }
     }
@@ -46,7 +46,7 @@ public class SunlightEventHandler {
         if (!event.getEntity().world.canBlockSeeSky(event.getEntity().getPosition())) return;
 
         if (event.getEntity() instanceof LivingEntity && !(event.getEntity() instanceof PlayerEntity) && !(event.getEntity() instanceof AmalgamationEntity) && !(event.getEntity() instanceof AbstractFishEntity) && !(event.getEntity() instanceof MutatedPumpkinEntity)) {
-            if (event.getEntity().getEntityId() % 4 != 0)
+            if (event.getEntity().getEntityId() % Config.mutationFraction != 0)
                 return;
             event.getEntity().remove();
             AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
@@ -90,6 +90,7 @@ public class SunlightEventHandler {
         if (event.getWorld().isRemote()) return;
         if (!TheHatefulSun.isSunHateful(event.getWorld().getWorld())) return;
         if (!event.getWorld().canBlockSeeSky(event.getPos())) return;
+        if (!Config.mutatePumpkins) return;
 
         if (event.getState().getBlock() == Blocks.PUMPKIN_STEM) {
             for (int i = 0; i < event.getWorld().getRandom().nextInt(3)+1; i++) {
@@ -115,6 +116,7 @@ public class SunlightEventHandler {
 
     @SubscribeEvent
     public static void mutatePlayer(LivingDeathEvent event) {
+        if (!Config.mutatePlayers) return;
         if (event.getEntity() instanceof PlayerEntity) {
             if (event.getSource().damageType.equals("sunlight")) {
                 AmalgamationEntity newEntity = new AmalgamationEntity(ModEntities.amalgamation, event.getEntity().world);
