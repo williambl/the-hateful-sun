@@ -12,7 +12,7 @@ logoFile="logo.png"
 credits=""
 authors="Willbl3pic"
 description='''
-When it's the day of a new moon, the sun will affect living beings!
+When it's the day of a new moon, the sun will mutate living beings!
 '''
 [[dependencies.thehatefulsun]] #optional
     modId="forge" #mandatory
