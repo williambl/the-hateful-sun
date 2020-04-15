@@ -1,0 +1,10 @@
+{
+  "homepage": "https://minecraft.curseforge.com/projects/the-hateful-sun",
+  "promos": {
+    "1.14.4-latest": "1.1.4",
+    "1.14.4-recommended": "1.1.4"
+  },
+  "1.14.4": {
+    "1.1.4": "- Rewritten config."
+  }
+}
